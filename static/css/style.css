@@ -581,3 +581,40 @@ h1, h2, h3, h4, h5, h6 {
 .fc-day-today {
     background-color: var(--primary-light) !important;
 }
+
+/* Custom Semantic Theme Badges & Text Helpers */
+.bg-primary-light { background-color: var(--primary-light) !important; }
+.bg-teal-light { background-color: var(--secondary-light) !important; }
+.bg-success-light { background-color: var(--accent-light) !important; }
+.bg-accent-light { background-color: var(--accent-light) !important; }
+.bg-warning-light { background-color: hsl(var(--warning-hsl), 0.15) !important; }
+.bg-danger-light { background-color: var(--danger-light) !important; }
+.bg-pink-light { background-color: rgba(244, 63, 94, 0.15) !important; }
+
+.text-teal { color: var(--secondary-color) !important; }
+.text-accent { color: var(--accent-color) !important; }
+.text-pink { color: hsl(350, 89%, 60%) !important; }
+.text-warning-dark { color: hsl(35, 92%, 35%) !important; }
+[data-bs-theme="dark"] .text-warning-dark { color: hsl(35, 92%, 65%) !important; }
+
+/* Dark Mode Highlight Text Visibility Restorations */
+[data-bs-theme="dark"] .text-primary {
+    color: hsl(210, 100%, 75%) !important; /* High contrast bright indigo/blue for dark backgrounds */
+}
+[data-bs-theme="dark"] .text-teal {
+    color: hsl(162, 70%, 65%) !important; /* High contrast bright mint */
+}
+[data-bs-theme="dark"] .text-success {
+    color: hsl(142, 70%, 65%) !important;
+}
+[data-bs-theme="dark"] .text-warning {
+    color: hsl(35, 92%, 65%) !important;
+}
+[data-bs-theme="dark"] .text-danger {
+    color: hsl(350, 89%, 70%) !important;
+}
+[data-bs-theme="dark"] .sidebar-menu a:hover, 
+[data-bs-theme="dark"] .sidebar-menu li.active a {
+    color: hsl(210, 100%, 75%) !important; /* Light text for active sidebar items */
+}
+
