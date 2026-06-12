@@ -79,9 +79,7 @@
                 
                 <hr class="my-3 text-secondary">
                 
-                <li class="{% if request.endpoint == 'contact' %}active{% endif %}">
-                    <a href="{{ url_for('contact') }}"><i class="fa-solid fa-envelope"></i> Contact Us</a>
-                </li>
+
                 <li class="{% if request.endpoint == 'about' %}active{% endif %}">
                     <a href="{{ url_for('about') }}"><i class="fa-solid fa-info-circle"></i> About Us</a>
                 </li>
@@ -192,7 +190,7 @@
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
                     <li class="nav-item"><a class="nav-link {% if request.endpoint == 'landing' %}active{% endif %}" href="{{ url_for('landing') }}">Home</a></li>
                     <li class="nav-item"><a class="nav-link {% if request.endpoint == 'about' %}active{% endif %}" href="{{ url_for('about') }}">About</a></li>
-                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}" href="{{ url_for('contact') }}">Contact</a></li>
+
                     <li class="nav-item"><a class="btn btn-outline-primary px-3 py-1.5" href="{{ url_for('login') }}">Login</a></li>
                     <li class="nav-item"><a class="btn btn-primary px-3 py-1.5 text-white" href="{{ url_for('register') }}">Get Started</a></li>
                 </ul>
@@ -230,7 +228,7 @@
                     <h5 class="font-outfit fw-bold text-white mb-3">Quick Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('about') }}" class="text-white-50 text-decoration-none">About Us</a></li>
-                        <li><a href="{{ url_for('contact') }}" class="text-white-50 text-decoration-none">Contact Us</a></li>
+
                         <li><a href="{{ url_for('login') }}" class="text-white-50 text-decoration-none">Login</a></li>
                         <li><a href="{{ url_for('register') }}" class="text-white-50 text-decoration-none">Create Account</a></li>
                     </ul>
