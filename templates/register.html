@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - MyMediFile{% endblock %}
+
+{% block public_content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7" data-aos="zoom-in" data-aos-duration="600">
+            <div class="glass-card p-4 p-md-5 border-0 shadow bg-white">
+                <div class="text-center mb-4">
+                    <i class="fa-solid fa-user-plus fs-1 text-primary mb-2"></i>
+                    <h3 class="fw-bold font-outfit text-primary">Create Your Medical Profile</h3>
+                    <p class="text-muted">Register an encrypted digital wellness ledger</p>
+                </div>
+                
+                <form action="{{ url_for('register') }}" method="POST" id="register-form">
+                    <div class="row g-3">
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-semibold">Full Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" name="full_name" class="form-control border-light-subtle" placeholder="e.g. John Doe" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-semibold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" name="email" class="form-control border-light-subtle" placeholder="e.g. john@example.com" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Number -->
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-semibold">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-phone"></i></span>
+                                <input type="tel" name="phone_number" class="form-control border-light-subtle" placeholder="e.g. +1 (555) 019-2834" required>
+                            </div>
+                        </div>
+                        
+                        <!-- DOB -->
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-semibold">Date of Birth</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-calendar"></i></span>
+                                <input type="date" name="date_of_birth" class="form-control border-light-subtle" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Gender selection -->
+                        <div class="col-12">
+                            <label class="form-label text-secondary fw-semibold">Gender</label>
+                            <div class="d-flex gap-4 p-2.5 rounded border border-light-subtle bg-light">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" required>
+                                    <label class="form-check-label text-secondary" for="genderMale">Male</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female">
+                                    <label class="form-check-label text-secondary" for="genderFemale">Female</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="genderOther" value="Other">
+                                    <label class="form-check-label text-secondary" for="genderOther">Other</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" name="password" id="register-password" class="form-control border-light-subtle" placeholder="Minimum 8 characters" required>
+                            </div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div id="password-strength-bar" class="progress-bar bg-secondary" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small id="password-strength-text" class="text-muted fs-8">Strength: Empty</small>
+                        </div>
+                        
+                        <!-- Confirm Password -->
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-semibold">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-circle-check"></i></span>
+                                <input type="password" name="confirm_password" id="register-confirm-password" class="form-control border-light-subtle" placeholder="Confirm your password" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+                        <label class="form-check-label text-secondary fs-7" for="agreeTerms">I represent that the health information logged is accurate, and I agree to the <a href="#" class="text-teal text-decoration-none fw-semibold">Security Terms</a>.</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 text-white shadow-sm font-outfit fw-bold mt-2">
+                        Create Account & Initialize Profile <i class="fa-solid fa-id-card ms-2"></i>
+                    </button>
+                    
+                    <div class="text-center mt-3 fs-7 text-secondary">
+                        Already have a health file? <a href="{{ url_for('login') }}" class="text-teal text-decoration-none fw-semibold">Log In</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

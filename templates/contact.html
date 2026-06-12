@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - MyMediFile{% endblock %}
+
+{% if session.get('user_id') %}
+    {% block content %}
+        {{ self.contact_body() }}
+    {% endblock %}
+{% else %}
+    {% block public_content %}
+        <div class="py-5">
+            {{ self.contact_body() }}
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block contact_body %}
+<div class="container py-4">
+    <div class="text-center mb-5" data-aos="fade-up">
+        <span class="badge bg-primary-light text-primary px-3 py-2 rounded-pill mb-2 fw-semibold">Get in Touch</span>
+        <h1 class="display-5 fw-bold font-outfit text-primary mb-3">Contact Our Support Team</h1>
+        <p class="lead text-secondary max-width-600 mx-auto">Have queries about data encryption, family profile setups, or general help? Send us a message.</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Contact Information & Map -->
+        <div class="col-lg-5" data-aos="fade-right">
+            <div class="glass-card p-4 h-100 border-0 shadow-sm bg-white d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="fw-bold font-outfit text-primary mb-4">Contact Details</h3>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="stat-icon bg-primary-light text-primary"><i class="fa-solid fa-location-dot"></i></div>
+                        <div>
+                            <small class="text-muted d-block">Main Headquarters</small>
+                            <span class="fw-semibold text-secondary">100 Health Sciences Plaza, Suite 400, New York, NY 10001</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="stat-icon bg-teal-light text-teal"><i class="fa-solid fa-phone"></i></div>
+                        <div>
+                            <small class="text-muted d-block">Phone Inquiries</small>
+                            <span class="fw-semibold text-secondary">+1 (800) 555-MEDI</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="stat-icon bg-accent-light text-accent"><i class="fa-solid fa-envelope"></i></div>
+                        <div>
+                            <small class="text-muted d-block">General Support Email</small>
+                            <span class="fw-semibold text-secondary">support@mymedifile.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Map Visual representation -->
+                <div class="rounded border mb-4 overflow-hidden position-relative bg-light" style="height: 180px;">
+                    <div class="position-absolute top-50 start-50 translate-middle text-center">
+                        <i class="fa-solid fa-map-location-dot fs-1 text-primary-light mb-2"></i>
+                        <span class="d-block fw-bold text-primary font-outfit">MyMediFile HQ Map View</span>
+                        <small class="text-muted">Interactive Map View</small>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div>
+                    <h6 class="text-muted text-uppercase fw-bold mb-3 font-outfit">Join Our Digital Communties</h6>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-info rounded-circle" style="width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-danger rounded-circle" style="width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="col-lg-7" data-aos="fade-left">
+            <div class="glass-card p-4 p-md-5 border-0 shadow-sm bg-white">
+                <h3 class="fw-bold font-outfit text-primary mb-4">Send a Secure Inquiry</h3>
+                <form action="{{ url_for('contact') }}" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary">Full Name</label>
+                            <input type="text" name="name" class="form-control py-2.5 border-light-subtle" placeholder="e.g. John Doe" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary">Email Address</label>
+                            <input type="email" name="email" class="form-control py-2.5 border-light-subtle" placeholder="e.g. john@example.com" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-secondary">Subject</label>
+                            <input type="text" name="subject" class="form-control py-2.5 border-light-subtle" placeholder="Subject of your message" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-secondary">Your Message</label>
+                            <textarea name="message" rows="5" class="form-control border-light-subtle" placeholder="Write details of your question here..." required></textarea>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100 py-2.5 text-white shadow-sm font-outfit">
+                                Submit Message <i class="fa-solid fa-paper-plane ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

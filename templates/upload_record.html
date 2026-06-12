@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Medical Record - MyMediFile{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1 font-outfit text-primary">Upload Medical Document</h1>
+            <p class="text-secondary mb-0">Securely upload health metrics, lab reports, prescriptions, or clinical files.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="glass-card p-4 p-md-5 bg-white border-0 shadow-sm">
+                <form action="{{ url_for('upload_record') }}" method="POST" enctype="multipart/form-data" id="upload-record-form">
+                    <div class="row g-4">
+                        <!-- Left Panel: Metadata form fields -->
+                        <div class="col-md-6">
+                            <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-2"><i class="fa-solid fa-file-signature text-teal me-1"></i> Document Details</h5>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fs-7 fw-semibold">Record Name / Title</label>
+                                <input type="text" name="title" class="form-control border-light-subtle" placeholder="e.g. Lipids Blood Report, Knee MRI" required>
+                            </div>
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label text-secondary fs-7 fw-semibold">Category</label>
+                                    <select name="category" class="form-select border-light-subtle" required>
+                                        <option value="" disabled selected>Select Category</option>
+                                        {% for cat in ['Blood Test', 'Prescription', 'Scan', 'Vaccination', 'Surgery', 'Allergy Report', 'Others'] %}
+                                            <option value="{{ cat }}">{{ cat }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-secondary fs-7 fw-semibold">Record Date</label>
+                                    <input type="date" name="date" class="form-control border-light-subtle" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fs-7 fw-semibold">Doctor Name (Optional)</label>
+                                <input type="text" name="doctor_name" class="form-control border-light-subtle" placeholder="Dr. Jane Smith">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fs-7 fw-semibold">Hospital/Clinic Name (Optional)</label>
+                                <input type="text" name="hospital_name" class="form-control border-light-subtle" placeholder="General Medical Clinic">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fs-7 fw-semibold">Clinical Notes / Description (Optional)</label>
+                                <textarea name="description" rows="3" class="form-control border-light-subtle" placeholder="Add diagnosis details, dosage notes, or next-step plans here..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Drag-and-drop zone -->
+                        <div class="col-md-6 d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-2"><i class="fa-solid fa-cloud-arrow-up text-teal me-1"></i> Attach Document</h5>
+                                
+                                <div class="drag-drop-zone p-5 mb-3" id="drop-zone">
+                                    <i class="fa-solid fa-folder-open display-4 text-muted mb-3 d-block"></i>
+                                    <span class="d-block fw-bold text-secondary mb-1">Drag and drop document here</span>
+                                    <span class="text-muted fs-8 d-block mb-3">PDF, PNG, JPG, or JPEG up to 16MB</span>
+                                    
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('file-input').click()">Browse Files</button>
+                                    <input type="file" name="record_file" id="file-input" class="d-none" accept=".pdf, .png, .jpg, .jpeg, .doc, .docx" required>
+                                </div>
+                                
+                                <!-- File Preview Card -->
+                                <div class="p-3 bg-light border rounded align-items-center justify-content-between d-none" id="file-preview-card">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <i class="fa-solid fa-file-pdf fs-2 text-danger" id="file-preview-icon"></i>
+                                        <div>
+                                            <strong class="text-primary font-outfit fs-7 d-block text-truncate" id="file-preview-name" style="max-width: 250px;">filename.pdf</strong>
+                                            <small class="text-muted fs-8" id="file-preview-size">0 KB</small>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0" id="btn-remove-file"><i class="fa-solid fa-circle-xmark fs-5"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit and Upload Progress -->
+                            <div>
+                                <div class="progress mb-3 d-none" id="upload-progress-container" style="height: 10px;">
+                                    <div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100 py-2.5 text-white shadow-sm font-outfit fw-bold">
+                                    Upload & Log Medical Record <i class="fa-solid fa-cloud-arrow-up ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const previewCard = document.getElementById('file-preview-card');
+    const previewName = document.getElementById('file-preview-name');
+    const previewSize = document.getElementById('file-preview-size');
+    const previewIcon = document.getElementById('file-preview-icon');
+    const btnRemove = document.getElementById('btn-remove-file');
+    const form = document.getElementById('upload-record-form');
+    const progressContainer = document.getElementById('upload-progress-container');
+    const progressBar = document.getElementById('upload-progress-bar');
+    
+    // Drag-and-drop triggers
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        }, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        }, false);
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+            fileInput.files = files;
+            updateFilePreview(files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+            updateFilePreview(fileInput.files[0]);
+        }
+    });
+    
+    btnRemove.addEventListener('click', () => {
+        fileInput.value = '';
+        previewCard.classList.remove('d-flex');
+        previewCard.classList.add('d-none');
+        dropZone.classList.remove('d-none');
+        fileInput.required = true;
+    });
+    
+    function updateFilePreview(file) {
+        previewName.innerText = file.name;
+        previewSize.innerText = (file.size / 1024).toFixed(1) + ' KB';
+        
+        // Choose icon
+        if (file.name.toLowerCase().endsWith('.pdf')) {
+            previewIcon.className = 'fa-solid fa-file-pdf fs-2 text-danger';
+        } else if (file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/)) {
+            previewIcon.className = 'fa-solid fa-file-image fs-2 text-teal';
+        } else {
+            previewIcon.className = 'fa-solid fa-file-medical fs-2 text-primary';
+        }
+        
+        dropZone.classList.add('d-none');
+        previewCard.classList.remove('d-none');
+        previewCard.classList.add('d-flex');
+        fileInput.required = false; // valid file loaded
+    }
+    
+    // Submit progress animation simulation
+    form.addEventListener('submit', (e) => {
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            showToast('Upload Error', 'Please select a document to upload.', 'danger');
+            return;
+        }
+        
+        progressContainer.classList.remove('d-none');
+        let width = 0;
+        const interval = setInterval(() => {
+            if (width >= 95) {
+                clearInterval(interval);
+            } else {
+                width += 15;
+                progressBar.style.width = width + '%';
+            }
+        }, 100);
+    });
+});
+</script>
+{% endblock %}

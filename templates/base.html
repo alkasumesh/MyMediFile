@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyMediFile - Complete Personal Health Record{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <!-- Custom Style Sheet -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    
+    <!-- Toast Container for client notices -->
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+    {% if session.get('user_id') %}
+    <!-- App Architecture Layout (Sidebar + Top bar + Content) -->
+    <div class="main-wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="sidebar-logo">
+                <i class="fa-solid fa-heart-pulse"></i> MyMediFile
+            </a>
+            
+            <ul class="sidebar-menu">
+                <li class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                </li>
+                <li class="{% if request.endpoint == 'health_profile' %}active{% endif %}">
+                    <a href="{{ url_for('health_profile') }}"><i class="fa-solid fa-user-doctor"></i> Health Profile</a>
+                </li>
+                <li class="{% if request.endpoint == 'medical_records' %}active{% endif %}">
+                    <a href="{{ url_for('medical_records') }}"><i class="fa-solid fa-file-medical"></i> Medical Records</a>
+                </li>
+                <li class="{% if request.endpoint == 'upload_record' %}active{% endif %}">
+                    <a href="{{ url_for('upload_record') }}"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Record</a>
+                </li>
+                <li class="{% if request.endpoint == 'health_timeline' %}active{% endif %}">
+                    <a href="{{ url_for('health_timeline') }}"><i class="fa-solid fa-clock-rotate-left"></i> Health Timeline</a>
+                </li>
+                <li class="{% if request.endpoint == 'appointments' %}active{% endif %}">
+                    <a href="{{ url_for('appointments') }}"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
+                </li>
+                <li class="{% if request.endpoint == 'emergency_access' %}active{% endif %}">
+                    <a href="{{ url_for('emergency_access') }}"><i class="fa-solid fa-qrcode text-danger"></i> Emergency Access</a>
+                </li>
+                <li class="{% if request.endpoint == 'family_members' %}active{% endif %}">
+                    <a href="{{ url_for('family_members') }}"><i class="fa-solid fa-users"></i> Family Members</a>
+                </li>
+                
+                <!-- Female Health module conditional to gender == 'Female' -->
+                {% if session.get('user_gender') == 'Female' %}
+                <li class="{% if request.endpoint == 'female_health' %}active{% endif %}">
+                    <a href="{{ url_for('female_health') }}"><i class="fa-solid fa-venus text-pink"></i> Female Health</a>
+                </li>
+                {% endif %}
+                
+                <li class="{% if request.endpoint == 'vaccinations' %}active{% endif %}">
+                    <a href="{{ url_for('vaccinations') }}"><i class="fa-solid fa-syringe"></i> Vaccinations</a>
+                </li>
+                <li class="{% if request.endpoint == 'health_monitoring' %}active{% endif %}">
+                    <a href="{{ url_for('health_monitoring') }}"><i class="fa-solid fa-heart-pulse"></i> Health Vitals</a>
+                </li>
+                <li class="{% if request.endpoint == 'health_analytics' %}active{% endif %}">
+                    <a href="{{ url_for('health_analytics') }}"><i class="fa-solid fa-chart-line"></i> Health Analytics</a>
+                </li>
+                <li class="{% if request.endpoint == 'notifications' %}active{% endif %}">
+                    <a href="{{ url_for('notifications') }}">
+                        <i class="fa-solid fa-bell"></i> Notifications
+                        {% if session.get('unread_notifications_count', 0) > 0 %}
+                        <span class="badge bg-danger rounded-pill float-end">{{ session.get('unread_notifications_count') }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                
+                <hr class="my-3 text-secondary">
+                
+                <li class="{% if request.endpoint == 'contact' %}active{% endif %}">
+                    <a href="{{ url_for('contact') }}"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+                </li>
+                <li class="{% if request.endpoint == 'about' %}active{% endif %}">
+                    <a href="{{ url_for('about') }}"><i class="fa-solid fa-info-circle"></i> About Us</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout') }}" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Top Dashboard Header Navigation -->
+            <header class="top-navbar">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="mobile-nav-toggle" id="sidebar-mobile-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="mb-0 fs-4 text-secondary">Hello, <span class="text-primary fw-bold">{{ session.get('user_name') }}</span></h2>
+                </div>
+                
+                <div class="navbar-actions">
+                    <!-- Profile Switcher Dropdown (Me vs Family Member Sub-profile) -->
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-primary btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" id="profileSwitchDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-user-circle fs-5"></i> 
+                            <span>
+                                {% if session.get('active_profile_name') %}
+                                    {{ session.get('active_profile_name') }} (Family)
+                                {% else %}
+                                    My Profile
+                                {% endif %}
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="profileSwitchDropdown">
+                            <li>
+                                <form action="{{ url_for('switch_profile') }}" method="POST">
+                                    <input type="hidden" name="profile_id" value="me">
+                                    <button type="submit" class="dropdown-item py-2 {% if not session.get('active_profile_id') %}active{% endif %}">
+                                        <i class="fa-solid fa-user me-2"></i> Primary Account (Me)
+                                    </button>
+                                </form>
+                            </li>
+                            {% if session.get('family_members_list') %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Switch to Family Member:</h6></li>
+                            {% for member in session.get('family_members_list') %}
+                            <li>
+                                <form action="{{ url_for('switch_profile') }}" method="POST">
+                                    <input type="hidden" name="profile_id" value="{{ member.id }}">
+                                    <button type="submit" class="dropdown-item py-2 {% if session.get('active_profile_id') == member.id %}active{% endif %}">
+                                        <i class="fa-solid fa-user-friends me-2"></i> {{ member.name }} ({{ member.relationship }})
+                                    </button>
+                                </form>
+                            </li>
+                            {% endfor %}
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item py-2 text-primary" href="{{ url_for('family_members') }}">
+                                    <i class="fa-solid fa-plus me-2"></i> Manage Members
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Dark Mode Selector -->
+                    <button class="dark-mode-toggle" id="theme-toggle-btn" title="Toggle Light/Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Alerts area -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, msg in messages %}
+                  <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: var(--border-radius-md);">
+                      {{ msg }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <!-- Core Page Content Grid Injector -->
+            <div class="flex-grow-1" data-aos="fade-up" data-aos-duration="600">
+                {% block content %}{% endblock %}
+            </div>
+            
+            <!-- Dashboard Footer -->
+            <footer class="footer mt-4 px-3 py-3 rounded text-center border-0 bg-transparent text-muted fs-7">
+                &copy; 2026 MyMediFile Health Management Platform. All rights reserved.
+            </footer>
+        </main>
+    </div>
+    
+    {% else %}
+    <!-- Public Layout (Landing Page, Register, Login, Contacts, About - with Landing Navbar) -->
+    <nav class="navbar navbar-expand-lg navbar-light landing-navbar fixed-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-primary font-outfit" href="{{ url_for('landing') }}">
+                <i class="fa-solid fa-heart-pulse fs-4 text-primary"></i> MyMediFile
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="landingNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-3">
+                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'landing' %}active{% endif %}" href="{{ url_for('landing') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'about' %}active{% endif %}" href="{{ url_for('about') }}">About</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}" href="{{ url_for('contact') }}">Contact</a></li>
+                    <li class="nav-item"><a class="btn btn-outline-primary px-3 py-1.5" href="{{ url_for('login') }}">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-primary px-3 py-1.5 text-white" href="{{ url_for('register') }}">Get Started</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div style="margin-top: 75px;">
+        <!-- Public Alerts -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="container mt-3">
+              {% for category, msg in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    {{ msg }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block public_content %}{% endblock %}
+    </div>
+
+    <!-- Public Page Footer -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container text-center text-md-start">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="font-outfit fw-bold text-teal mb-3"><i class="fa-solid fa-heart-pulse"></i> MyMediFile</h5>
+                    <p class="text-white-50">Empowering patients and health organizations with unified, secure, and smart medical health records available anywhere, anytime.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="font-outfit fw-bold text-white mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('about') }}" class="text-white-50 text-decoration-none">About Us</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-white-50 text-decoration-none">Contact Us</a></li>
+                        <li><a href="{{ url_for('login') }}" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="{{ url_for('register') }}" class="text-white-50 text-decoration-none">Create Account</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="font-outfit fw-bold text-white mb-3">Legal & Security</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">GDPR Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white-50 my-4">
+            <div class="text-center text-white-50">
+                &copy; 2026 MyMediFile. Designed and engineered for digital wellness.
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation Library JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            once: true,
+            duration: 800
+        });
+    </script>
+    <!-- Global Script -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Vaccination Tracker - MyMediFile{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Header Block -->
+    <div class="row align-items-center mb-4">
+        <div class="col-sm-6">
+            <h1 class="h3 mb-1 font-outfit text-primary">Vaccination Tracker</h1>
+            <p class="text-secondary mb-0">Record immunizations, track booster doses, and check due dates.</p>
+        </div>
+        <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+            <button class="btn btn-primary text-white shadow-sm font-outfit" data-bs-toggle="modal" data-bs-target="#addVaccineModal">
+                <i class="fa-solid fa-syringe me-2"></i> Log Vaccination
+            </button>
+        </div>
+    </div>
+
+    <!-- Due Booster Notifications Alert Panel -->
+    {% if due_alerts %}
+        {% for alert in due_alerts %}
+        <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center justify-content-between p-3 mb-3" style="border-radius: var(--border-radius-md);">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fa-solid fa-triangle-exclamation fs-4 text-warning"></i>
+                <div>
+                    <h6 class="mb-0 fw-bold font-outfit text-warning-dark">Vaccination Booster Due Soon</h6>
+                    <small class="text-secondary">Your next dose for <strong>{{ alert.vaccine_name }}</strong> is scheduled on <strong>{{ alert.next_due_date.strftime('%B %d, %Y') }}</strong>.</small>
+                </div>
+            </div>
+            <span class="badge bg-warning text-dark px-2.5 py-1">Due in {{ (alert.next_due_date - today).days }} days</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Vax History Table card -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4 bg-white border-0 shadow-sm h-100">
+                <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-2">Immunization Log Ledger</h5>
+                
+                {% if vaccinations %}
+                <div class="table-responsive">
+                    <table class="table table-hover text-secondary fs-7 align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Vaccine / Immunization</th>
+                                <th>Administered Date</th>
+                                <th>Next Booster Due</th>
+                                <th>Hospital/Clinic</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vax in vaccinations %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2.5">
+                                        <div class="p-2 bg-accent-light text-accent rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-shield-virus"></i>
+                                        </div>
+                                        <strong class="text-primary">{{ vax.vaccine_name }}</strong>
+                                    </div>
+                                </td>
+                                <td>{{ vax.date_taken.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    {% if vax.next_due_date %}
+                                        {% if vax.next_due_date < today %}
+                                            <span class="text-danger fw-bold"><i class="fa-solid fa-circle-exclamation"></i> Overdue ({{ vax.next_due_date.strftime('%b %d, %Y') }})</span>
+                                        {% else %}
+                                            <span class="text-secondary fw-semibold">{{ vax.next_due_date.strftime('%b %d, %Y') }}</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">No booster due</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ vax.hospital_clinic_name or 'N/A' }}</td>
+                                <td>
+                                    <form action="{{ url_for('delete_vaccination', vax_id=vax.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Remove this vaccination record?');">
+                                        <button type="submit" class="btn btn-link text-danger p-0"><i class="fa-solid fa-trash-can"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-vial-virus display-3 text-muted mb-3"></i>
+                    <p class="text-secondary fs-7 max-width-400 mx-auto">No immunization history has been logged. Click log button above to add COVID-19, Hepatitis, Flu or other vaccinations.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Visual overview card -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 bg-white border-0 shadow-sm h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-2">Immunization Progress</h5>
+                    <div class="position-relative" style="height: 200px;">
+                        <canvas id="vaxProgressChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-light border border-light-subtle rounded text-secondary fs-8">
+                    <h6 class="mb-1 text-primary fw-bold font-outfit"><i class="fa-solid fa-circle-info text-teal"></i> About Immunizations</h6>
+                    <span>Maintaining an up-to-date vaccination record ledger improves clinical defense metrics and is reflected on your **Health Score**.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Vaccination Modal -->
+<div class="modal fade" id="addVaccineModal" tabindex="-1" aria-labelledby="addVaccineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-0 py-3">
+                <h5 class="modal-title font-outfit text-primary fw-bold" id="addVaccineModalLabel">Record Vaccination</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('vaccinations') }}" method="POST">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label text-secondary fw-semibold">Vaccine / Immunization Name</label>
+                        <input type="text" name="vaccine_name" class="form-control border-light-subtle" placeholder="e.g. COVID-19 Pfizer, Influenza B, Tetanus Booster" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary fw-semibold">Hospital / Clinic / Pharmacy</label>
+                        <input type="text" name="hospital_clinic_name" class="form-control border-light-subtle" placeholder="e.g. Walgreens Pharmacy, St. Mary General Clinic">
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label text-secondary fw-semibold">Date Administered</label>
+                            <input type="date" name="date_taken" class="form-control border-light-subtle" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-secondary fw-semibold">Next Booster Due (Optional)</label>
+                            <input type="date" name="next_due_date" class="form-control border-light-subtle">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light py-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary text-white">Log Immunization</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Generate simple Doughnut representing vax progress
+    const takenCount = {{ vaccinations|length }};
+    const alertCount = {{ due_alerts|length }};
+    
+    // Fallback display values if zero records exist
+    const completedCount = takenCount > 0 ? takenCount : 1;
+    const pendingCount = alertCount > 0 ? alertCount : 0;
+    
+    HealthCharts.renderVaccinationProgress('vaxProgressChart', completedCount, pendingCount);
+});
+</script>
+{% endblock %}

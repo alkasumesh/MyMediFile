@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - MyMediFile{% endblock %}
+
+{% if session.get('user_id') %}
+    {% block content %}
+        {{ self.about_body() }}
+    {% endblock %}
+{% else %}
+    {% block public_content %}
+        <div class="py-5">
+            {{ self.about_body() }}
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block about_body %}
+<div class="container py-4">
+    <!-- Header Hero -->
+    <div class="text-center mb-5" data-aos="fade-up">
+        <span class="badge bg-primary-light text-primary px-3 py-2 rounded-pill mb-2 fw-semibold">Digitizing Healthcare</span>
+        <h1 class="display-5 fw-bold font-outfit text-primary mb-3">About MyMediFile</h1>
+        <p class="lead text-secondary max-width-600 mx-auto">Learn about our mission to make patient information secure, accessible, and organized worldwide.</p>
+    </div>
+
+    <!-- Mission & Vision Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6" data-aos="fade-right">
+            <div class="glass-card p-4 p-md-5 h-100 border-0 shadow-sm bg-white">
+                <div class="stat-icon bg-primary-light text-primary mb-4" style="width: 56px; height: 56px;"><i class="fa-solid fa-bullseye fs-4"></i></div>
+                <h3 class="fw-bold font-outfit text-primary mb-3">Our Mission</h3>
+                <p class="text-secondary mb-0">
+                    To empower patients, doctors, and clinical facilities with centralized, easy-to-use health tools. We believe that having quick, secure access to your clinical records leads to faster diagnosis, reduced errors, and better health outcomes.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6" data-aos="fade-left">
+            <div class="glass-card p-4 p-md-5 h-100 border-0 shadow-sm bg-white">
+                <div class="stat-icon bg-teal-light text-teal mb-4" style="width: 56px; height: 56px;"><i class="fa-solid fa-eye fs-4"></i></div>
+                <h3 class="fw-bold font-outfit text-primary mb-3">Our Vision</h3>
+                <p class="text-secondary mb-0">
+                    A world where critical health files are never lost or delayed. Through our cloud timeline, emergency QR codes, and dashboard trackers, we are shaping the future of digital health management for families and healthcare professionals alike.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Digitization Benefits -->
+    <div class="glass-card p-4 p-md-5 border-0 shadow-sm mb-5 bg-white" data-aos="fade-up">
+        <h3 class="fw-bold font-outfit text-primary text-center mb-4">Benefits of Digital Health Records</h3>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="d-flex gap-3">
+                    <i class="fa-solid fa-circle-check text-accent fs-3 mt-1"></i>
+                    <div>
+                        <h5 class="fw-bold font-outfit text-primary">Instant Data Retrievals</h5>
+                        <p class="text-muted fs-7 mb-0">No more searching through file drawers. Instantly search and filter past blood tests or vaccine reports.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex gap-3">
+                    <i class="fa-solid fa-circle-check text-accent fs-3 mt-1"></i>
+                    <div>
+                        <h5 class="fw-bold font-outfit text-primary">Reliable Vitals Logs</h5>
+                        <p class="text-muted fs-7 mb-0">Log blood pressure, heart rates, and blood sugar levels daily. Observe shifts on visual trend charts.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex gap-3">
+                    <i class="fa-solid fa-circle-check text-accent fs-3 mt-1"></i>
+                    <div>
+                        <h5 class="fw-bold font-outfit text-primary">Emergency Readiness</h5>
+                        <p class="text-muted fs-7 mb-0">Generate a custom Emergency QR code containing medical allergies and emergency contacts.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

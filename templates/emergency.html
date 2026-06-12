@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Card - MyMediFile{% endblock %}
+
+{% block styles %}
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #printable-emergency-card, #printable-emergency-card * {
+            visibility: visible;
+        }
+        #printable-emergency-card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1.2);
+            border: 2px solid #F43F5E !important;
+            box-shadow: none !important;
+            width: 100% !important;
+        }
+        .sidebar, .top-navbar, .btn, .footer {
+            display: none !important;
+        }
+        .content-area {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Header Block -->
+    <div class="row align-items-center mb-4">
+        <div class="col-sm-6">
+            <h1 class="h3 mb-1 font-outfit text-primary">Emergency Medical Card</h1>
+            <p class="text-secondary mb-0">Generate, display, and print your secure QR medical profile for quick access in emergency events.</p>
+        </div>
+        <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+            <button onclick="window.print()" class="btn btn-outline-danger shadow-sm font-outfit me-2">
+                <i class="fa-solid fa-print"></i> Print Medical Card
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Emergency Card Render -->
+        <div class="col-lg-8">
+            <div class="emergency-card-wrapper shadow-lg" id="printable-emergency-card">
+                <div class="emergency-header d-flex align-items-center justify-content-center gap-2 py-3 bg-danger text-white">
+                    <i class="fa-solid fa-triangle-exclamation fs-4 pulse-glow"></i>
+                    <h4 class="mb-0 font-outfit fw-bold tracking-wide">EMERGENCY MEDICAL INFO</h4>
+                </div>
+                
+                <div class="p-4 bg-white">
+                    <div class="row g-4 align-items-center">
+                        <!-- Left Info details -->
+                        <div class="col-md-7">
+                            <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-1">Patient Vitals</h5>
+                            
+                            <table class="table table-sm table-borderless text-secondary fs-7">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-semibold" style="width: 130px;">Name:</td>
+                                        <td class="text-primary fw-bold">{{ user.full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Blood Group:</td>
+                                        <td class="text-danger fw-bold fs-6">{{ profile.blood_group if profile else 'N/A' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">DOB:</td>
+                                        <td>{{ user.date_of_birth.strftime('%B %d, %Y') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Allergies:</td>
+                                        <td class="text-danger fw-semibold">{{ profile.allergies if (profile and profile.allergies) else 'No Known Allergies' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Chronic Diseases:</td>
+                                        <td class="text-warning fw-semibold">{{ profile.chronic_diseases if (profile and profile.chronic_diseases) else 'No Stored Chronic Diseases' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Current Meds:</td>
+                                        <td>{{ profile.current_medications if (profile and profile.current_medications) else 'None logged' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-1 mt-4">Emergency Contacts</h5>
+                            <table class="table table-sm table-borderless text-secondary fs-7 mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-semibold" style="width: 130px;">Contact:</td>
+                                        <td><strong>{{ profile.emergency_contact_name or 'N/A' }}</strong> ({{ profile.emergency_contact_phone or 'N/A' }})</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Physician:</td>
+                                        <td><strong>Dr. {{ profile.family_doctor_name or 'N/A' }}</strong> ({{ profile.family_doctor_phone or 'N/A' }})</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Insurance Policy:</td>
+                                        <td>{{ profile.insurance_provider or 'N/A' }} ({{ profile.insurance_policy_number or 'N/A' }})</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Right QR Code panel -->
+                        <div class="col-md-5 text-center border-start border-light-subtle d-flex flex-column align-items-center justify-content-center">
+                            <div class="p-2 border rounded bg-light mb-3">
+                                <div id="qrcode-box" style="width: 160px; height: 160px;"></div>
+                            </div>
+                            <span class="fs-8 text-muted d-block"><i class="fa-solid fa-qrcode"></i> Responder Quick Scan</span>
+                            <small class="text-muted fs-9">Scans provide emergency clinical information instantly</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instruction Column -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 h-100 bg-white border-0 shadow-sm d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-2">How to use this Card</h5>
+                    <ol class="text-secondary fs-7 ps-3 mb-4">
+                        <li class="mb-2">Ensure your **Health Profile** contains updated blood types, drug allergies, and active medications.</li>
+                        <li class="mb-2">Generate and print this card on a rigid sheet.</li>
+                        <li class="mb-2">Place it in your wallet, pouch, or car dashboard.</li>
+                        <li class="mb-2">Medical responders scan the QR code to pull contacts and critical health attributes in emergency scenarios.</li>
+                    </ol>
+                </div>
+                
+                <div class="p-3 bg-danger-light rounded text-danger border border-danger-subtle d-flex align-items-start gap-2.5">
+                    <i class="fa-solid fa-triangle-exclamation fs-5 mt-1"></i>
+                    <div>
+                        <h6 class="mb-1 fw-bold font-outfit">Critical Notice</h6>
+                        <small class="fs-8">This QR contains sensitive medical data for emergencies. Keep this card in a safe and secure location.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- QRCode.js CDN Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const qrContainer = document.getElementById('qrcode-box');
+    
+    // Construct emergency payload JSON for QR code scanner
+    const emergencyPayload = {
+        name: "{{ user.full_name }}",
+        dob: "{{ user.date_of_birth.strftime('%Y-%m-%d') }}",
+        blood: "{{ profile.blood_group if profile else 'N/A' }}",
+        allergies: "{{ profile.allergies if (profile and profile.allergies) else 'None Stored' }}",
+        chronic: "{{ profile.chronic_diseases if (profile and profile.chronic_diseases) else 'None Stored' }}",
+        meds: "{{ profile.current_medications if (profile and profile.current_medications) else 'None Stored' }}",
+        ice: "{{ profile.emergency_contact_name or 'N/A' }}: {{ profile.emergency_contact_phone or 'N/A' }}",
+        doc: "Dr. {{ profile.family_doctor_name or 'N/A' }}: {{ profile.family_doctor_phone or 'N/A' }}"
+    };
+    
+    // Convert to nice formatted string
+    const qrString = `MyMediFile ICE Profile:\n` +
+                     `Patient: ${emergencyPayload.name}\n` +
+                     `Blood: ${emergencyPayload.blood}\n` +
+                     `Allergies: ${emergencyPayload.allergies}\n` +
+                     `Conditions: ${emergencyPayload.chronic}\n` +
+                     `Meds: ${emergencyPayload.meds}\n` +
+                     `ICE: ${emergencyPayload.ice}\n` +
+                     `Doc: ${emergencyPayload.doc}`;
+                     
+    // Generate QR
+    new QRCode(qrContainer, {
+        text: qrString,
+        width: 160,
+        height: 160,
+        colorDark: "#0F4C81",
+        colorLight: "#FFFFFF",
+        correctLevel: QRCode.CorrectLevel.M
+    });
+});
+</script>
+{% endblock %}

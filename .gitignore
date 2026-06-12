@@ -1,0 +1,17 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+ENV/
+env/
+.env
+
+# Databases
+mymedifile.db
+
+# Uploads
+static/uploads/*
+!static/uploads/.gitkeep

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - MyMediFile{% endblock %}
+
+{% block public_content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center align-items-center g-5">
+        <!-- Text/Branding Panel -->
+        <div class="col-lg-5 text-center text-lg-start d-none d-lg-block" data-aos="fade-right">
+            <h1 class="display-4 fw-bold font-outfit text-primary mb-3">Welcome Back!</h1>
+            <p class="lead text-secondary">Log in to check your health metrics, sync family records, review scheduled appointments, or verify timeline records.</p>
+            <div class="d-flex align-items-center gap-3 mt-4 text-secondary">
+                <i class="fa-solid fa-user-shield fs-3 text-teal"></i>
+                <span>Secure SSL/TLS encrypted patient workspace.</span>
+            </div>
+        </div>
+        
+        <!-- Login Card -->
+        <div class="col-lg-5" data-aos="zoom-in" data-aos-duration="600">
+            <div class="glass-card p-4 p-md-5 border-0 shadow bg-white">
+                <div class="text-center mb-4">
+                    <i class="fa-solid fa-heart-pulse fs-1 text-primary mb-2"></i>
+                    <h3 class="fw-bold font-outfit text-primary">Patient Portal</h3>
+                    <p class="text-muted">Enter credentials to access your file</p>
+                </div>
+                
+                <form action="{{ url_for('login') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label text-secondary fw-semibold">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-envelope"></i></span>
+                            <input type="email" name="email" class="form-control py-2 border-light-subtle" placeholder="e.g. john@example.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <label class="form-label text-secondary fw-semibold mb-0">Password</label>
+                            <a href="#" class="text-teal text-decoration-none fs-7 fw-semibold">Forgot Password?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-light-subtle text-muted"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" name="password" class="form-control py-2 border-light-subtle" placeholder="Enter secure password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" name="remember" class="form-check-input" id="rememberCheck">
+                        <label class="form-check-label text-secondary fs-7" for="rememberCheck">Remember this browser session</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 text-white shadow-sm font-outfit fw-bold mb-3">
+                        Log In <i class="fa-solid fa-right-to-bracket ms-2"></i>
+                    </button>
+                    
+                    <div class="text-center fs-7 text-secondary">
+                        Don't have a secure health file? <a href="{{ url_for('register') }}" class="text-teal text-decoration-none fw-semibold">Create Account</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

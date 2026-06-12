@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Profile - MyMediFile{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1 font-outfit text-primary">Personal Health Profile</h1>
+            <p class="text-secondary mb-0">Manage clinical details, vital metrics, and emergency contacts.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile View & BMI Stats -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 text-center bg-white border-0 shadow-sm mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 fw-bold" style="width: 72px; height: 72px; font-size: 1.8rem;">
+                    {{ session.get('user_name')[0] if session.get('user_name') else 'U' }}
+                </div>
+                <h4 class="fw-bold font-outfit text-primary mb-1">{{ session.get('user_name') }}</h4>
+                <p class="text-muted fs-7 mb-4">Primary Patient Account</p>
+                
+                <hr class="my-4 text-secondary">
+                
+                <!-- BMI Card Widget -->
+                <div class="p-3 bg-light rounded text-start border border-light-subtle">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-primary font-outfit fs-6"><i class="fa-solid fa-weight-scale text-teal me-1"></i> Body Mass Index (BMI)</span>
+                        {% if profile and profile.bmi > 0 %}
+                            {% set cat = profile.bmi_category %}
+                            {% set badge_class = 'bg-success' if cat == 'Normal' else 'bg-warning' if cat == 'Underweight' else 'bg-danger' %}
+                            <span class="badge {{ badge_class }} badge-category">{{ cat }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary badge-category">N/A</span>
+                        {% endif %}
+                    </div>
+                    {% if profile and profile.bmi > 0 %}
+                        <h2 class="display-5 fw-extrabold text-primary font-outfit mb-0">{{ profile.bmi }}</h2>
+                        <small class="text-muted">Calculated: {{ profile.weight }} kg &div; ({{ profile.height / 100 }} m)&sup2;</small>
+                    {% else %}
+                        <h3 class="fw-bold text-muted font-outfit my-2">Not Configured</h3>
+                        <small class="text-muted">Enter height and weight to calculate BMI</small>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Medical Summary -->
+            <div class="glass-card p-4 bg-white border-0 shadow-sm">
+                <h5 class="fw-bold font-outfit text-primary mb-3"><i class="fa-solid fa-notes-medical text-teal me-1"></i> Medical Snapshot</h5>
+                <ul class="list-group list-group-flush text-secondary fs-7">
+                    <li class="list-group-item d-flex justify-content-between px-0 bg-transparent">
+                        <span>Blood Group:</span>
+                        <strong class="text-primary">{{ profile.blood_group if profile else 'N/A' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0 bg-transparent">
+                        <span>Allergies:</span>
+                        <strong class="text-danger">{{ profile.allergies if profile and profile.allergies else 'None' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0 bg-transparent">
+                        <span>Chronic Conditions:</span>
+                        <strong class="text-warning">{{ profile.chronic_diseases if profile and profile.chronic_diseases else 'None' }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Health Profile Form -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4 p-md-5 bg-white border-0 shadow-sm">
+                <form action="{{ url_for('health_profile') }}" method="POST">
+                    <!-- Tab Section 1: Physical Metrics -->
+                    <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-2"><i class="fa-solid fa-person text-teal me-1"></i> Clinical Characteristics</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Blood Group</label>
+                            <select name="blood_group" class="form-select border-light-subtle" required>
+                                <option value="" disabled {% if not profile %}selected{% endif %}>Select Group</option>
+                                {% for bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                    <option value="{{ bg }}" {% if profile and profile.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Height (cm)</label>
+                            <input type="number" step="0.1" name="height" class="form-control border-light-subtle" placeholder="e.g. 175" value="{{ profile.height if profile else '' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Weight (kg)</label>
+                            <input type="number" step="0.1" name="weight" class="form-control border-light-subtle" placeholder="e.g. 70" value="{{ profile.weight if profile else '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Allergies</label>
+                            <textarea name="allergies" rows="2" class="form-control border-light-subtle" placeholder="e.g. Penicillin, Peanuts, Pollen">{{ profile.allergies if profile else '' }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Chronic Diseases</label>
+                            <textarea name="chronic_diseases" rows="2" class="form-control border-light-subtle" placeholder="e.g. Asthma, Hypertension, Diabetes">{{ profile.chronic_diseases if profile else '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Current Medications</label>
+                            <textarea name="current_medications" rows="2" class="form-control border-light-subtle" placeholder="e.g. Metformin 500mg daily, Albuterol inhaler as needed">{{ profile.current_medications if profile else '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Tab Section 2: Emergency Details -->
+                    <h5 class="fw-bold font-outfit text-primary mb-3 border-bottom pb-2"><i class="fa-solid fa-triangle-exclamation text-danger me-1"></i> Emergency Contact & Insurance</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Emergency Contact Name</label>
+                            <input type="text" name="emergency_contact_name" class="form-control border-light-subtle" placeholder="Full name of contact" value="{{ profile.emergency_contact_name if profile else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Emergency Contact Phone</label>
+                            <input type="tel" name="emergency_contact_phone" class="form-control border-light-subtle" placeholder="Phone number" value="{{ profile.emergency_contact_phone if profile else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Primary Family Doctor</label>
+                            <input type="text" name="family_doctor_name" class="form-control border-light-subtle" placeholder="Doctor's name" value="{{ profile.family_doctor_name if profile else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Doctor Contact Phone</label>
+                            <input type="tel" name="family_doctor_phone" class="form-control border-light-subtle" placeholder="Doctor's office phone" value="{{ profile.family_doctor_phone if profile else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Insurance Provider</label>
+                            <input type="text" name="insurance_provider" class="form-control border-light-subtle" placeholder="e.g. Blue Cross Blue Shield" value="{{ profile.insurance_provider if profile else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fs-7 fw-semibold">Policy Number</label>
+                            <input type="text" name="insurance_policy_number" class="form-control border-light-subtle" placeholder="Insurance ID number" value="{{ profile.insurance_policy_number if profile else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary px-4 py-2.5 text-white font-outfit shadow-sm">
+                            Save Medical Profile <i class="fa-solid fa-save ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
