@@ -29,16 +29,7 @@
                 <div class="stat-icon bg-primary-light text-primary"><i class="fa-solid fa-file-medical"></i></div>
             </div>
         </div>
-        <!-- Appointments Card -->
-        <div class="col-6 col-lg-2">
-            <div class="glass-card stat-card bg-white border-0 shadow-sm">
-                <div>
-                    <span class="text-muted fs-8 d-block mb-1">Appointments</span>
-                    <h3 class="fw-bold font-outfit text-teal mb-0">{{ upcoming_appts }}</h3>
-                </div>
-                <div class="stat-icon bg-teal-light text-teal"><i class="fa-solid fa-calendar-check"></i></div>
-            </div>
-        </div>
+
         <!-- Active Prescriptions -->
         <div class="col-6 col-lg-2">
             <div class="glass-card stat-card bg-white border-0 shadow-sm">
@@ -93,10 +84,7 @@
                             <span><i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload Medical Record</span>
                             <i class="fa-solid fa-chevron-right fs-8"></i>
                         </a>
-                        <a href="{{ url_for('appointments') }}" class="btn btn-outline-primary text-start py-2.5 fs-7 d-flex align-items-center justify-content-between">
-                            <span><i class="fa-solid fa-calendar-plus me-2"></i> Schedule Appointment</span>
-                            <i class="fa-solid fa-chevron-right fs-8"></i>
-                        </a>
+
                         <a href="{{ url_for('health_profile') }}" class="btn btn-outline-primary text-start py-2.5 fs-7 d-flex align-items-center justify-content-between">
                             <span><i class="fa-solid fa-user-pen me-2"></i> Update Health Profile</span>
                             <i class="fa-solid fa-chevron-right fs-8"></i>

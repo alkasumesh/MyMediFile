@@ -46,9 +46,7 @@
                 <li class="{% if request.endpoint == 'health_timeline' %}active{% endif %}">
                     <a href="{{ url_for('health_timeline') }}"><i class="fa-solid fa-clock-rotate-left"></i> Health Timeline</a>
                 </li>
-                <li class="{% if request.endpoint == 'appointments' %}active{% endif %}">
-                    <a href="{{ url_for('appointments') }}"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
-                </li>
+
                 <li class="{% if request.endpoint == 'emergency_access' %}active{% endif %}">
                     <a href="{{ url_for('emergency_access') }}"><i class="fa-solid fa-qrcode text-danger"></i> Emergency Access</a>
                 </li>
@@ -66,9 +64,7 @@
                 <li class="{% if request.endpoint == 'vaccinations' %}active{% endif %}">
                     <a href="{{ url_for('vaccinations') }}"><i class="fa-solid fa-syringe"></i> Vaccinations</a>
                 </li>
-                <li class="{% if request.endpoint == 'health_monitoring' %}active{% endif %}">
-                    <a href="{{ url_for('health_monitoring') }}"><i class="fa-solid fa-heart-pulse"></i> Health Vitals</a>
-                </li>
+
                 <li class="{% if request.endpoint == 'health_analytics' %}active{% endif %}">
                     <a href="{{ url_for('health_analytics') }}"><i class="fa-solid fa-chart-line"></i> Health Analytics</a>
                 </li>
